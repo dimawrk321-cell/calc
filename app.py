@@ -10,12 +10,11 @@ HTML = """
 <head>
 <meta charset="UTF-8">
 <title>Chaos Calculator</title>
-
 <style>
 body {
     background: #0f172a;
     color: white;
-    font-family: Arial;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,72 +23,84 @@ body {
 
 .calculator {
     background: #1e293b;
-    padding: 20px;
-    border-radius: 15px;
-    width: 300px;
+    padding: 25px;
+    border-radius: 20px;
+    width: 320px;
+    box-shadow: 0 0 20px #3b82f6;
 }
 
 input {
     width: 100%;
     padding: 15px;
-    font-size: 20px;
-    border-radius: 10px;
+    font-size: 22px;
+    border-radius: 12px;
     border: none;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    text-align: right;
 }
 
 #buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
+    gap: 8px;
 }
 
 button {
     padding: 15px;
     font-size: 18px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     background: #3b82f6;
     color: white;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    background: #2563eb;
 }
 
 .result {
-    margin-top: 10px;
-    font-size: 22px;
+    margin-top: 15px;
+    font-size: 24px;
     text-align: right;
+    color: #facc15;
 }
 </style>
 </head>
-
 <body>
 
 <div class="calculator">
     <input id="display" readonly>
     <div id="buttons"></div>
-    <button style="width:100%; margin-top:10px;" onclick="clearDisplay()">C</button>
+    <button style="width:100%; margin-top:10px; background:#ef4444;" onclick="clearDisplay()">C</button>
     <div class="result" id="result"></div>
 </div>
 
 <script>
 let display = document.getElementById("display");
+let resultDisplay = document.getElementById("result");
 
 function add(value) {
     display.value += value;
+    shuffleButtons();
 }
 
 function clearDisplay() {
     display.value = "";
-    document.getElementById("result").innerText = "";
+    resultDisplay.innerText = "";
+    shuffleButtons();
 }
 
 function calculate() {
     try {
-        let result = eval(display.value);
-        document.getElementById("result").innerText = result;
+        let res = eval(display.value);
+        resultDisplay.innerText = res;
     } catch {
-        document.getElementById("result").innerText = "Error";
+        resultDisplay.innerText = "Error";
     }
+    shuffleButtons();
 }
 
 // 🔥 хаос
@@ -105,8 +116,6 @@ function createButtons() {
         "+","-","*","/",".","="
     ];
 
-    buttons = shuffle(buttons);
-
     buttons.forEach(btn => {
         let b = document.createElement("button");
         b.innerText = btn;
@@ -118,6 +127,18 @@ function createButtons() {
         }
 
         container.appendChild(b);
+    });
+}
+
+function shuffleButtons() {
+    let container = document.getElementById("buttons");
+    let buttons = Array.from(container.children);
+    let texts = buttons.map(b => b.innerText);
+    texts = shuffle(texts);
+
+    buttons.forEach((b, i) => {
+        b.innerText = texts[i];
+        b.onclick = texts[i] === "=" ? calculate : () => add(texts[i]);
     });
 }
 
